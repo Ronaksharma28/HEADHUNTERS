@@ -515,23 +515,71 @@ function appendChatMessage(sender, text) {
   }
 }
 
-window.askPresetQuestion = function (question) {
+// Store conversation history
+let chatHistory = [];
+
+// Send message to Gemini backend
+async function askAI(question) {
   appendChatMessage("user", question);
-  setTimeout(() => {
-    appendChatMessage("bot", generateAIResponse(question));
-  }, 220);
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: question,
+        history: chatHistory
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || `Server error (${response.status})`);
+    }
+
+    chatHistory.push({ role: "user", content: question });
+    chatHistory.push({ role: "assistant", content: data.answer });
+
+    appendChatMessage("bot", data.answer);
+  } catch (error) {
+    console.error("AI Chat Error:", error);
+    const msg = error.message.includes("Failed to fetch")
+      ? "Cannot reach the backend at http://127.0.0.1:8000. Make sure Uvicorn is running."
+      : `AI Assistant Error: ${error.message}`;
+    appendChatMessage("bot", msg);
+  }
+}
+
+// Preset question buttons
+window.askPresetQuestion = function (question) {
+  if (window.spaceAudio) {
+    window.spaceAudio.playHover();
+  }
+  askAI(question);
 };
 
+// Normal chat input
 const chatForm = document.getElementById("chatForm");
+
 if (chatForm) {
   chatForm.addEventListener("submit", (e) => {
     e.preventDefault();
+
     const input = document.getElementById("chatInput");
-    const text = input.value.trim();
-    if (!text) return;
-    appendChatMessage("user", text);
+    const question = input.value.trim();
+
+    if (!question) return;
+
     input.value = "";
-    setTimeout(() => appendChatMessage("bot", generateAIResponse(text)), 240);
+
+    if (window.spaceAudio) {
+      window.spaceAudio.playClick();
+    }
+
+    askAI(question);
   });
 }
 

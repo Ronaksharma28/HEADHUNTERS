@@ -6,3 +6,5 @@ __pycache__/
 .env
 backend/.env
 node_modules/
+codebase-dump.txt
+export-code.js
