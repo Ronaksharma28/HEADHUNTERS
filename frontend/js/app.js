@@ -482,7 +482,6 @@ function appendChatMessage(sender, text) {
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
   } else {
-    // Typewriter effect for AI response
     div.innerHTML = `<strong>PSI Combustion Assistant:</strong> <span class="typing-text"></span><span class="cursor-blink">▌</span>`;
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
@@ -491,15 +490,26 @@ function appendChatMessage(sender, text) {
     const cursor = div.querySelector(".cursor-blink");
     let charIdx = 0;
 
+    function formatChatMarkdown(raw) {
+      return raw
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/^#{2,3}\s*(.*)$/gm, "<div style='font-weight:700;color:#38bdf8;margin-top:10px;margin-bottom:4px;'>$1</div>")
+        .replace(/^\s*[\*\-]\s+(.*)$/gm, "<div style='padding-left:12px;margin:2px 0;'>• $1</div>")
+        .replace(/\n/g, "<br>");
+    }
+
     function typeChar() {
       if (charIdx < text.length) {
-        textSpan.textContent += text.charAt(charIdx);
-        charIdx++;
+        charIdx += 2; // Smooth 2-char step per frame
+        textSpan.innerHTML = formatChatMarkdown(text.slice(0, charIdx));
         box.scrollTop = box.scrollHeight;
-        setTimeout(typeChar, 14);
+        setTimeout(typeChar, 12);
       } else {
+        textSpan.innerHTML = formatChatMarkdown(text);
         cursor.remove();
-        // Add Copy Button
         const copyBtn = document.createElement("button");
         copyBtn.className = "copy-msg-btn";
         copyBtn.innerHTML = `📋 Copy`;
