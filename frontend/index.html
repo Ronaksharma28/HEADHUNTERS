@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NASA Microgravity Combustion & Cabin Fire Dynamics Suite</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Fixed Background Space Canvas: Twinkling & Revolving Starfield -->
+  <canvas id="spaceBackgroundCanvas"></canvas>
+
+  <!-- Dual Cybernetic Cosmic Cursor -->
+  <div class="custom-cursor-dot"></div>
+  <div class="custom-cursor-ring"></div>
+
+  <div class="app-shell">
+    <!-- Persistent Translucent Left Side Navigation Bar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-badge">NASA PSI // CIR // MSG</div>
+        <h1>Microgravity Fire Lab</h1>
+        <p class="subtitle">Zero-G Combustion & Cabin Safety</p>
+      </div>
+
+      <nav class="nav-menu" aria-label="Primary Navigation">
+        <button class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">🛸</span>
+          <span>Space & Zero-G Dashboard</span>
+        </button>
+        <button class="nav-item" data-view="experiments">
+          <span class="nav-icon">🔬</span>
+          <span>Investigations & Flashcards</span>
+        </button>
+        <button class="nav-item" data-view="livemodel">
+          <span class="nav-icon">🔥</span>
+          <span>Live Flame & Cabin Airflow</span>
+        </button>
+        <button class="nav-item" data-view="assistant">
+          <span class="nav-icon">🤖</span>
+          <span>Ask AI Assistant</span>
+        </button>
+        <button class="nav-item" data-view="comparative">
+          <span class="nav-icon">⚖️</span>
+          <span>Comparative Analysis & Theory</span>
+        </button>
+        <button class="nav-item" data-view="risk">
+          <span class="nav-icon">🛡️</span>
+          <span>Mission Risk Profile</span>
+        </button>
+        <button class="nav-item" data-view="siranking">
+          <span class="nav-icon">📊</span>
+          <span>SI Ranking Leaderboard</span>
+        </button>
+        <button class="nav-item" data-view="references">
+          <span class="nav-icon">📚</span>
+          <span>NASA References</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="telemetry-pill">
+          <span class="pulse-dot"></span>
+          <span>ISS Destiny Lab // 10⁻⁶ g</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Viewport -->
+    <main class="main-content">
+      <header class="topbar">
+        <button id="menuToggle" class="menu-toggle" aria-label="Toggle Menu">☰</button>
+        <div class="topbar-title">
+          <h2 id="viewTitle">Space Exploration & Zero-Gravity Fire Behavior</h2>
+          <span id="viewSubtitle" class="view-badge">Physical Sciences Informatics (PSI) Telemetry</span>
+        </div>
+        <div class="topbar-actions">
+          <div class="hud-telemetry-pill">
+            <span class="pulse-dot"></span>
+            <span id="hudMissionClock">MET +142:18:24:12</span>
+          </div>
+          <button id="audioToggleBtn" class="audio-toggle-btn" aria-label="Toggle Audio FX">
+            <span>🔊</span> Audio: ON
+          </button>
+          <button class="quick-jump-btn" onclick="switchView('livemodel')">Live Sim →</button>
+        </div>
+      </header>
+
+      <!-- VIEW 1: NORMAL DASHBOARD -->
+      <section id="view-dashboard" class="view-section active">
+        <div class="hero-banner">
+          <div class="hero-text">
+            <span class="eyebrow">ORBITAL COMBUSTION PHYSICS</span>
+            <h3>How Fire Behaves in Zero Gravity & Why It Matters for Deep Space</h3>
+            <p>
+              On Earth (1g), hot combustion gases expand, become less dense, and rise due to buoyancy, drawing fresh oxygen into the base of a teardrop flame. In microgravity (0g / 10⁻⁶g), buoyancy-driven convection vanishes. Flames become spherical, diffusion-controlled, cooler, and capable of burning at lower oxygen concentrations—posing critical fire safety challenges for ISS, Lunar Gateway, and Mars transit habitats.
+            </p>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-card">
+              <span class="stat-val">10⁻⁶ g</span>
+              <span class="stat-lbl">ISS Microgravity Level</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-val">5× – 8×</span>
+              <span class="stat-lbl">Higher Soot Volume (ACME)</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-val">~600 K</span>
+              <span class="stat-lbl">Cool Flame Regime (FLEX)</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-val">15–25 cm/s</span>
+              <span class="stat-lbl">Nominal Cabin Ventilation</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <h4>1. Absence of Buoyant Convection</h4>
+            <p>Without gravity pulling denser cold air downward, hot exhaust gases do not rise. Molecular diffusion becomes the primary transport mechanism carrying oxygen inward and combustion products outward, creating symmetric spherical flamelets.</p>
+          </div>
+          <div class="card">
+            <h4>2. Spacecraft Cabin Ventilation Hazard</h4>
+            <p>Astronauts rely on Environmental Control and Life Support System (ECLSS) fans to prevent CO₂ pockets. However, low-velocity cabin airflow (5–30 cm/s) acts as forced convection, feeding oxygen to smoldering wires and accelerating flame spread.</p>
+          </div>
+          <div class="card">
+            <h4>3. Two-Stage "Cool Flames"</h4>
+            <p>Discovered aboard the ISS during NASA's FLEX experiments, hydrocarbon droplets can extinguish visibly yet continue burning invisibly at ~500–800 K via low-temperature peroxide chemistry, requiring specialized optical/ion sensors.</p>
+          </div>
+        </div>
+
+        <div class="card mt-20">
+          <div class="card-header">
+            <h4>Space Exploration Fire Milestones & Cabin Environments</h4>
+            <span class="tag">NASA PSI & NTRS Archive</span>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mission / Habitat</th>
+                  <th>Cabin Pressure</th>
+                  <th>O₂ Concentration</th>
+                  <th>Ventilation Flow</th>
+                  <th>Fire Safety Architecture</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>International Space Station (ISS)</strong></td>
+                  <td>101.3 kPa (14.7 psi)</td>
+                  <td>21% O₂ / 79% N₂</td>
+                  <td>10 – 40 cm/s forced</td>
+                  <td>Photoelectric smoke detectors, CO₂ & water mist extinguishers, cabin fan shutdown</td>
+                </tr>
+                <tr>
+                  <td><strong>Artemis / Lunar Gateway</strong></td>
+                  <td>56.5 kPa (8.2 psi)</td>
+                  <td>34% O₂ / 66% N₂</td>
+                  <td>15 – 30 cm/s forced</td>
+                  <td>Enhanced Limiting Oxygen Index (LOI) material screening via SoFIE</td>
+                </tr>
+                <tr>
+                  <td><strong>Space Shuttle (STS)</strong></td>
+                  <td>101.3 kPa (14.7 psi)</td>
+                  <td>21% O₂ / 79% N₂</td>
+                  <td>12 – 25 cm/s forced</td>
+                  <td>Halon 1301 suppression, ionization smoke sensors, LSP/SPICE testbeds</td>
+                </tr>
+                <tr>
+                  <td><strong>Future Mars Transit Vehicle</strong></td>
+                  <td>55 – 70 kPa</td>
+                  <td>30% – 34% O₂</td>
+                  <td>15 – 35 cm/s closed-loop</td>
+                  <td>Fine water mist, regenerative scrubbers, multi-spectral cool-flame detection</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: EXPERIMENT WINDOW & TRANSLUCENT FLASHCARDS -->
+      <section id="view-experiments" class="view-section">
+        <div class="section-intro">
+          <h3>NASA Microgravity Combustion Investigations (PSI & NTRS Dataset)</h3>
+          <p>Explore orbital investigations as translucent interactive flashcards. Click "Flip Flashcard 🔄" to test your zero-g fire dynamics knowledge, or inspect telemetry charts.</p>
+        </div>
+
+        <!-- Flashcards Toolbar & Filters -->
+        <div class="experiments-toolbar">
+          <div class="deck-filter-pills">
+            <button class="deck-filter-chip active" data-cat="all" onclick="setDeckFilter('all', this)">All</button>
+            <button class="deck-filter-chip" data-cat="Droplets" onclick="setDeckFilter('Droplets', this)">💧 Droplets</button>
+            <button class="deck-filter-chip" data-cat="Gaseous" onclick="setDeckFilter('Gaseous', this)">🔥 Gaseous</button>
+            <button class="deck-filter-chip" data-cat="Solids" onclick="setDeckFilter('Solids', this)">🪵 Solids & Polymers</button>
+            <button class="deck-filter-chip" data-cat="LargeScale" onclick="setDeckFilter('LargeScale', this)">🚀 Large-Scale Cygnus</button>
+            <button class="deck-filter-chip" data-cat="Aerosols" onclick="setDeckFilter('Aerosols', this)">🌫️ Smoke & Aerosols</button>
+          </div>
+
+          <div class="toolbar-controls-right">
+            <div class="search-input-wrap">
+              <input type="text" id="expSearchInput" placeholder="Search investigations..." />
+            </div>
+
+            <div class="view-mode-toggle">
+              <button id="mode-grid" class="view-toggle-btn active" onclick="setViewMode('grid')">Grid Cards</button>
+              <button id="mode-study" class="view-toggle-btn" onclick="setViewMode('study')">Study Deck 🔄</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="experiments-layout">
+          <!-- Translucent 3D Flashcards Grid / Deck -->
+          <div id="experimentList"></div>
+
+          <!-- Detailed Drill-Down Panel with Telemetry Graphs -->
+          <div id="experimentDetailPanel" class="detail-drawer">
+            <div class="detail-header">
+              <div>
+                <span id="detailBadge" class="tag">PSI INVESTIGATION</span>
+                <h3 id="detailTitle">Select an Experiment</h3>
+                <p id="detailMeta" class="muted"></p>
+              </div>
+              <button id="closeDetailBtn" class="btn-secondary">Close Detail ✕</button>
+            </div>
+
+            <div class="detail-body">
+              <div class="detail-text-block">
+                <h4>Scientific Overview & Mechanism</h4>
+                <p id="detailDeepExplanation"></p>
+                <h4>Key NASA Findings & Spacecraft Impact</h4>
+                <ul id="detailFindingsList" class="findings-list"></ul>
+              </div>
+
+              <div class="detail-charts-grid">
+                <div class="chart-box">
+                  <h5 id="chart1Title">Primary Telemetry Profile</h5>
+                  <canvas id="expChartPrimary"></canvas>
+                </div>
+                <div class="chart-box">
+                  <h5 id="chart2Title">1g vs 0g Comparative Metric</h5>
+                  <canvas id="expChartSecondary"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: LIVE MODEL OF FLAME & PROMINENT CABIN AIRFLOW -->
+      <section id="view-livemodel" class="view-section">
+        <div class="sim-header">
+          <div>
+            <h3>Live Microgravity Flame & Cabin Airflow Simulation</h3>
+            <p>Interactive physics simulation illustrating how ECLSS cabin ventilation vectors deform a zero-gravity spherical flame, transport O₂, and advect soot/CO₂ plumes. Hover to activate thermal probe HUD; click to induce spark disturbance!</p>
+          </div>
+          <div class="sim-status-bar">
+            <span class="status-chip" id="regimeIndicator">REGIME: LOW-FLOW DIFFUSION</span>
+            <span class="status-chip" id="reynoldsIndicator">Re: 42.5</span>
+          </div>
+        </div>
+
+        <div class="sim-workspace">
+          <!-- Prominent Canvas Viewport -->
+          <div class="canvas-stage">
+            <canvas id="flameAirflowCanvas" width="860" height="500"></canvas>
+            <div class="canvas-legend">
+              <span><i class="dot airflow"></i> Prominent Cabin Airflow Streamlines & Velocity Vectors</span>
+              <span><i class="dot o2"></i> O₂ Oxidizer Particles</span>
+              <span><i class="dot flame"></i> Reaction Zone (T<sub>max</sub>)</span>
+              <span><i class="dot soot"></i> Soot / CO₂ Exhaust Plume</span>
+            </div>
+          </div>
+
+          <!-- Simulation Controls -->
+          <aside class="sim-controls">
+            <h4>Cabin & Combustion Controls</h4>
+
+            <div class="control-group">
+              <label for="airflowSlider">
+                Cabin Airflow Velocity (v<sub>air</sub>)
+                <strong id="airflowVal">18 cm/s</strong>
+              </label>
+              <input type="range" id="airflowSlider" min="0" max="60" value="18" step="1" />
+              <small>0 cm/s = pure stagnant diffusion; 15–30 cm/s = nominal ISS ventilation</small>
+            </div>
+
+            <div class="control-group">
+              <label for="flowAngleSlider">
+                Ventilation Duct Angle
+                <strong id="flowAngleVal">0° (Left → Right)</strong>
+              </label>
+              <input type="range" id="flowAngleSlider" min="-45" max="45" value="0" step="5" />
+            </div>
+
+            <div class="control-group">
+              <label for="oxygenSlider">
+                Cabin O₂ Mole Fraction
+                <strong id="oxygenVal">21% O₂</strong>
+              </label>
+              <input type="range" id="oxygenSlider" min="14" max="36" value="21" step="1" />
+              <small>Gateway exploration atmosphere uses 34% O₂ at 56.5 kPa</small>
+            </div>
+
+            <div class="control-group">
+              <label for="gravitySelect">Gravity Environment</label>
+              <select id="gravitySelect">
+                <option value="0" selected>0g — Microgravity (ISS Orbit)</option>
+                <option value="0.16">0.16g — Lunar Surface (Artemis)</option>
+                <option value="0.38">0.38g — Martian Surface</option>
+                <option value="1.0">1.0g — Earth Normal Gravity</option>
+              </select>
+            </div>
+
+            <div class="control-group toggle-row">
+              <label>
+                <input type="checkbox" id="showStreamlines" checked />
+                Prominent Airflow Streamlines & Arrows
+              </label>
+            </div>
+
+            <div class="control-group toggle-row">
+              <label>
+                <input type="checkbox" id="showTempField" checked />
+                Thermal Halo & Radiative Envelope
+              </label>
+            </div>
+
+            <div class="preset-buttons">
+              <button class="btn-preset" onclick="applySimPreset('stagnant')">0g Stagnant Sphere</button>
+              <button class="btn-preset" onclick="applySimPreset('iss')">ISS Nominal Vent (18 cm/s)</button>
+              <button class="btn-preset" onclick="applySimPreset('gateway')">Lunar Gateway (34% O₂)</button>
+              <button class="btn-preset danger" onclick="applySimPreset('suppress')">Emergency Fan Cut-Off</button>
+            </div>
+
+            <div class="live-readouts">
+              <div class="readout"><span>Flame Shape</span><strong id="readoutShape">Wake-Elongated</strong></div>
+              <div class="readout"><span>Peak Temp</span><strong id="readoutTemp">1,480 K</strong></div>
+              <div class="readout"><span>Soot Yield</span><strong id="readoutSoot">High (4.2× 1g)</strong></div>
+              <div class="readout"><span>Spread Rate</span><strong id="readoutSpread">1.45 mm/s</strong></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- VIEW 4: ASK AI ASSISTANT -->
+      <section id="view-assistant" class="view-section">
+        <div class="assistant-container">
+          <div class="assistant-header">
+            <h3>NASA Microgravity Combustion AI Research Assistant</h3>
+            <p>Ask questions about zero-g flame physics, cabin ventilation safety, FLEX/ACME/Saffire/SoFIE datasets, or spacecraft fire suppression.</p>
+          </div>
+
+          <div class="prompt-chips">
+            <button class="chip" onclick="askPresetQuestion('Why does a flame turn spherical in zero gravity?')">Why does a flame turn spherical in 0g?</button>
+            <button class="chip" onclick="askPresetQuestion('How does cabin airflow affect fire spread on the ISS?')">How does cabin airflow affect fire spread?</button>
+            <button class="chip" onclick="askPresetQuestion('What are cool flames discovered in NASA FLEX?')">What are cool flames in FLEX?</button>
+            <button class="chip" onclick="askPresetQuestion('How do we extinguish a fire in a spacecraft cabin?')">How do we extinguish spacecraft fires?</button>
+            <button class="chip" onclick="askPresetQuestion('How does SoFIE test 34% O2 Lunar Gateway atmospheres?')">SoFIE & 34% O₂ Gateway atmosphere</button>
+          </div>
+
+          <div id="chatMessages" class="chat-box">
+            <div class="msg bot">
+              <strong>PSI Combustion Assistant:</strong> Welcome to the Microgravity Fire Lab. I have indexed NASA PSI and NTRS data across FLEX, ACME, BASS, Saffire, SAME, and SoFIE. Ask me anything about zero-gravity flame dynamics, Peclet/Damköhler numbers, or cabin ventilation safety!
+            </div>
+          </div>
+
+          <form id="chatForm" class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Ask about zero-g flame behavior, cabin airflow, or NASA experiments..." required />
+            <button type="submit" class="btn-primary">Ask AI</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- VIEW 5: COMPARATIVE ANALYSIS WITH THEORY -->
+      <section id="view-comparative" class="view-section">
+        <div class="section-intro">
+          <h3>Comparative Analysis: Terrestrial (1g) vs. Microgravity (0g) Combustion Theory</h3>
+          <p>Theoretical fluid mechanics, dimensionless scaling numbers, and transport equations governing flame structure under gravitational vs. forced-ventilation regimes.</p>
+        </div>
+
+        <div class="theory-grid">
+          <div class="card theory-card">
+            <h4>1. Grashof & Froude Number Scaling</h4>
+            <div class="formula-box">
+              Gr = (g · β · ΔT · L³) / ν² &nbsp;&nbsp;|&nbsp;&nbsp; Fr = U² / (g · L)
+            </div>
+            <p>
+              In terrestrial flames, the <strong>Grashof number (Gr ~ 10⁴–10⁶)</strong> dominates, generating buoyant velocities U<sub>b</sub> ≈ √(g·L·ΔT/T<sub>∞</sub>) ~ 0.5–1.5 m/s. On the ISS (g ≈ 10⁻⁶g₀), Gr → 0, collapsing natural convection. When cabin ventilation U<sub>air</sub> is introduced, the mixed-convection ratio Gr / Re² determines whether forced airflow or diffusion governs flame geometry.
+            </p>
+          </div>
+
+          <div class="card theory-card">
+            <h4>2. Damköhler Number & Radiative Extinction</h4>
+            <div class="formula-box">
+              Da = τ<sub>flow</sub> / τ<sub>chem</sub> = (L / U<sub>diff</sub>) / τ<sub>chem</sub>
+            </div>
+            <p>
+              Because molecular diffusion is slow, characteristic residence times τ<sub>flow</sub> increase dramatically in microgravity. While high residence time initially boosts soot nucleation, expanded spherical flame surface area increases volumetric radiative heat loss (Q̇<sub>rad</sub> ∝ T⁴·V<sub>flame</sub>). At large droplet diameters, radiative loss drops temperature below the hot-flame threshold, triggering extinction or transition into a low-temperature <strong>Cool Flame</strong>.
+            </p>
+          </div>
+
+          <div class="card theory-card">
+            <h4>3. Lewis Number & Diffusive-Thermal Instability</h4>
+            <div class="formula-box">
+              Le = α / D<sub>mass</sub> = k / (ρ · c<sub>p</sub> · D<sub>mass</sub>)
+            </div>
+            <p>
+              In lean hydrogen or methane mixtures (Le &lt; 1), mass diffusivity of the deficient reactant exceeds thermal diffusivity. In zero-g, this triggers cellular flame structures and isolated <strong>flame balls</strong> (studied in NASA SOFBALL) that remain stable far below terrestrial lean flammability limits.
+            </p>
+          </div>
+        </div>
+
+        <!-- Interactive Dimensionless Scaling Calculator -->
+        <div class="calculator-card">
+          <div class="card-header">
+            <h4>Interactive Dimensionless Scaling Calculator (Gr, Re, Fr, Ri)</h4>
+            <span class="tag">REAL-TIME FLUID SCALING ENGINE</span>
+          </div>
+          <div class="calc-grid">
+            <div class="calc-controls">
+              <div class="control-group">
+                <label>Flow Velocity (U): <strong id="calcVelocityVal">18 cm/s</strong></label>
+                <input type="range" id="calcVelocitySlider" min="0" max="60" value="18" oninput="updateDimensionlessCalculator()" />
+              </div>
+              <div class="control-group">
+                <label>Characteristic Flame Length (L): <strong id="calcLengthVal">5 cm</strong></label>
+                <input type="range" id="calcLengthSlider" min="1" max="25" value="5" oninput="updateDimensionlessCalculator()" />
+              </div>
+              <div class="control-group">
+                <label>Gravity Level</label>
+                <select id="calcGravitySelect" onchange="updateDimensionlessCalculator()">
+                  <option value="0" selected>0g — Microgravity (ISS Destiny)</option>
+                  <option value="0.16">0.16g — Lunar Surface</option>
+                  <option value="0.38">0.38g — Martian Surface</option>
+                  <option value="1.0">1.0g — Earth Normal</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-results">
+              <div class="calc-readouts">
+                <div class="calc-box">
+                  <span>Grashof (Gr)</span>
+                  <strong id="calcGrVal">0</strong>
+                </div>
+                <div class="calc-box">
+                  <span>Reynolds (Re)</span>
+                  <strong id="calcReVal">56.3</strong>
+                </div>
+                <div class="calc-box">
+                  <span>Froude (Fr)</span>
+                  <strong id="calcFrVal">∞</strong>
+                </div>
+              </div>
+              <div class="calc-regime-box">
+                <span>Predicted Combustion Regime:</span>
+                <span id="calcRegimeBadge" style="color:#00f5ff">Forced Convection Only (Gr = 0)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-20">
+          <h4>Side-by-Side Regime Comparison Matrix</h4>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Physical Parameter</th>
+                  <th>Earth Normal Gravity (1g)</th>
+                  <th>Stagnant Microgravity (0g, v = 0)</th>
+                  <th>Ventilated Spacecraft Cabin (0g, v = 15–30 cm/s)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Dominant Transport</strong></td>
+                  <td>Buoyant natural convection (U<sub>b</sub> ~ 1 m/s)</td>
+                  <td>Molecular diffusion (D ~ 0.2 cm²/s)</td>
+                  <td>Low-speed forced convection + diffusion</td>
+                </tr>
+                <tr>
+                  <td><strong>Flame Geometry</strong></td>
+                  <td>Elongated teardrop, flickering tip</td>
+                  <td>Symmetric sphere / hemisphere</td>
+                  <td>Wake-stabilized ovoid / upstream-leaning</td>
+                </tr>
+                <tr>
+                  <td><strong>Flame Temperature</strong></td>
+                  <td>1,800 – 2,200 K</td>
+                  <td>1,200 – 1,600 K (or 550–750 K cool flame)</td>
+                  <td>1,450 – 1,850 K (oxygen-replenished)</td>
+                </tr>
+                <tr>
+                  <td><strong>Soot & Smoke Behavior</strong></td>
+                  <td>Oxidation in hot upper tip; buoyant plume</td>
+                  <td>Long residence time → large soot aggregates</td>
+                  <td>Advected downstream into cabin filters/detectors</td>
+                </tr>
+                <tr>
+                  <td><strong>Limiting Oxygen Index (LOI)</strong></td>
+                  <td>Higher (~17–18% for typical polymers)</td>
+                  <td>Can self-extinguish due to CO₂ blanketing</td>
+                  <td>Lower (~14–16%): easier ignition at low flow!</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card mt-20">
+          <h4>Theoretical Flame Spread Rate vs. Opposed Airflow Velocity</h4>
+          <canvas id="theoryComparisonChart" height="110"></canvas>
+        </div>
+      </section>
+
+      <!-- VIEW 6: MISSION RISK PROFILE -->
+      <section id="view-risk" class="view-section">
+        <div class="section-intro">
+          <h3>Spacecraft Mission Fire Risk Profile & Interactive Evaluator</h3>
+          <p>Quantitative fire risk assessment across orbital and planetary mission architectures based on cabin atmosphere, ventilation velocity, material flammability, and suppression readiness.</p>
+        </div>
+
+        <div class="risk-grid">
+          <div class="card">
+            <h4>Interactive Mission Risk Simulator</h4>
+            <div class="control-group">
+              <label>Mission Profile Preset</label>
+              <select id="riskMissionSelect" onchange="updateRiskProfile()">
+                <option value="iss">ISS Low Earth Orbit (21% O₂, 101.3 kPa)</option>
+                <option value="gateway">Lunar Gateway Exploration (34% O₂, 56.5 kPa)</option>
+                <option value="orion">Orion Crew Capsule (26.5% O₂, 70.3 kPa)</option>
+                <option value="mars">Mars Transit Deep Space (32% O₂, 60 kPa)</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>Cabin Airflow Velocity: <strong id="riskAirVal">20 cm/s</strong></label>
+              <input type="range" id="riskAirSlider" min="0" max="50" value="20" oninput="updateRiskProfile()" />
+            </div>
+            <div class="control-group">
+              <label>Polymer / Cable Insulation Load: <strong id="riskFuelVal">Moderate (45%)</strong></label>
+              <input type="range" id="riskFuelSlider" min="10" max="100" value="45" oninput="updateRiskProfile()" />
+            </div>
+            <div class="risk-score-banner" id="riskBanner">
+              <div>
+                <span class="muted">COMPOSITE FIRE RISK INDEX</span>
+                <h2 id="riskScoreDisplay">42 / 100 — MODERATE</h2>
+              </div>
+              <p id="riskActionAdvice">Standard ISS protocol: Maintain automated ECLSS fan interlock and multi-point smoke detection.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4>Mission Hazard Breakdown Radar</h4>
+            <canvas id="riskRadarChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card mt-20">
+          <h4>Failure Mode & Effects Analysis (FMEA) — Cabin Fire Scenarios</h4>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Hazard Scenario</th>
+                  <th>Likelihood</th>
+                  <th>Severity</th>
+                  <th>Primary Physics Driver</th>
+                  <th>Mitigation Protocol</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Avionics Wire Overheat Behind Rack</td>
+                  <td>Medium</td>
+                  <td>Critical</td>
+                  <td>Low cabin airflow (10–15 cm/s) sustains smoldering</td>
+                  <td>Rack differential smoke sampling + power cut-off</td>
+                </tr>
+                <tr>
+                  <td>Elevated O₂ Exploration Atmosphere Ignition</td>
+                  <td>Low-Med</td>
+                  <td>Catastrophic</td>
+                  <td>34% O₂ lowers ignition energy & accelerates flame spread</td>
+                  <td>NASA-STD-6001B upward/micro-g material screening</td>
+                </tr>
+                <tr>
+                  <td>Invisible Cool-Flame Vapor Combustion</td>
+                  <td>Low</td>
+                  <td>High</td>
+                  <td>Low-temperature (~600 K) fuel oxidation without soot</td>
+                  <td>CO / formaldehyde optical gas sensors + IR imaging</td>
+                </tr>
+                <tr>
+                  <td>Post-Suppression Toxic Gas Accumulation</td>
+                  <td>Medium</td>
+                  <td>High</td>
+                  <td>No buoyant stratification; CO/HCN mix uniformly in cabin</td>
+                  <td>Activated carbon / LiOH scrubbers + portable breathing masks</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 7: SI RANKING -->
+      <section id="view-siranking" class="view-section">
+        <div class="section-intro">
+          <h3>Spacecraft Flammability & Safety Index (SI Ranking)</h3>
+          <p>Comparative Safety Index (SI) ranking of spacecraft cabin materials, fuels, and fire suppressants derived from NASA PSI microgravity combustion benchmarks (BASS, SoFIE, FLEX, and Saffire). Click headers to sort.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h4>Material & Suppressant Safety Index (SI) Leaderboard</h4>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <input type="text" id="siSearchInput" placeholder="Filter materials..." style="background:rgba(5,9,20,0.7); border:1px solid var(--border); color:#fff; padding:6px 12px; border-radius:6px; font-size:12.5px; outline:none;" />
+              <select id="siFilterSelect" onchange="renderSIRanking()">
+                <option value="all">All Specimens & Agents</option>
+                <option value="Polymer">Cabin Polymers & Fabrics</option>
+                <option value="Fuel">Propellants & Liquid Fuels</option>
+                <option value="Suppressant">Fire Suppressants</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="sortable-th" onclick="sortSITable('rank')">Rank ⬍</th>
+                  <th class="sortable-th" onclick="sortSITable('name')">Material / Agent ⬍</th>
+                  <th class="sortable-th" onclick="sortSITable('category')">Category ⬍</th>
+                  <th>0g Limiting O₂ Index (LOI)</th>
+                  <th>Peak Spread Rate (0g)</th>
+                  <th class="sortable-th" onclick="sortSITable('score')">SI Score (0–100) ⬍</th>
+                  <th>Flight Rating</th>
+                </tr>
+              </thead>
+              <tbody id="siTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card mt-20">
+          <h4>SI Score Distribution Across Spacecraft Materials & Agents</h4>
+          <canvas id="siBarChart" height="105"></canvas>
+        </div>
+      </section>
+
+      <!-- VIEW 8: REFERENCES -->
+      <section id="view-references" class="view-section">
+        <div class="section-intro">
+          <h3>NASA Data Sources & Scientific References</h3>
+          <p>All experimental summaries, microgravity combustion parameters, and physical models in this suite are grounded in official NASA open-science repositories and technical report servers.</p>
+        </div>
+
+        <div class="ref-cards">
+          <div class="card ref-card">
+            <span class="tag">PRIMARY API & TECHNICAL ARCHIVE</span>
+            <h4>1. NASA Technical Reports Server (NTRS) OpenAPI</h4>
+            <p>Provides programmatic access to peer-reviewed NASA Glenn Research Center combustion papers, microgravity drop-tower studies, ACME/FLEX technical reports, and spacecraft fire safety standards.</p>
+            <a href="https://ntrs.nasa.gov/api/openapi/?utm_source=chatgpt.com" target="_blank" rel="noopener noreferrer" class="ref-link">
+              https://ntrs.nasa.gov/api/openapi/?utm_source=chatgpt.com ↗
+            </a>
+          </div>
+
+          <div class="card ref-card">
+            <span class="tag">OPEN DATA PORTAL</span>
+            <h4>2. NASA Open Data Portal (data.nasa.gov)</h4>
+            <p>Centralized catalog for NASA mission datasets, ISS Environmental Control and Life Support System (ECLSS) telemetry, spacecraft safety metrics, and physical science metadata.</p>
+            <a href="https://data.nasa.gov/?utm_source=chatgpt.com" target="_blank" rel="noopener noreferrer" class="ref-link">
+              https://data.nasa.gov/?utm_source=chatgpt.com ↗
+            </a>
+          </div>
+
+          <div class="card ref-card">
+            <span class="tag">COMBUSTION EXPERIMENT REPOSITORY</span>
+            <h4>3. NASA Physical Sciences Informatics (PSI) — History & Repository</h4>
+            <p>Repository housing raw and reduced experimental data from ISS Microgravity Science Glovebox (MSG) and Combustion Integrated Rack (CIR) investigations including FLEX, ACME, BASS, Saffire, SAME, and SoFIE.</p>
+            <a href="https://science.nasa.gov/physical-sciences-informatics-psi/history-of-physical-science-informatics/" target="_blank" rel="noopener noreferrer" class="ref-link">
+              https://science.nasa.gov/physical-sciences-informatics-psi/history-of-physical-science-informatics/ ↗
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="audio-fx.js"></script>
+  <script src="space-theme.js"></script>
+  <script src="data.js"></script>
+  <script src="simulation.js"></script>
+  <script src="app.js"
+  <script src="api-bridge.js"></script>></script>
+</body>
+</html>
