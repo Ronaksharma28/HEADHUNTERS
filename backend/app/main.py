@@ -48,18 +48,15 @@ if not supabase:
 gemini_client = (
     genai.Client(
         api_key=settings.GEMINI_API_KEY,
-        http_options=types.HttpOptions(timeout=15_000),
+        http_options=types.HttpOptions(timeout=30_000),  # 30s max per model attempt
     )
     if settings.GEMINI_API_KEY
     else None
 )
-if not gemini_client:
-    print("⚠️ WARNING: GEMINI_API_KEY is missing.", flush=True)
 
-# Thread pool used to enforce a hard timeout on the (synchronous) Gemini SDK call
 _gemini_executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
-GEMINI_TIMEOUT_SECONDS = 45
+GEMINI_TIMEOUT_SECONDS = 65
 
 SYSTEM_INSTRUCTION = """
 You are the Flame in Freefall AI Research Assistant for NASA microgravity combustion and spacecraft fire safety.
@@ -271,24 +268,27 @@ def list_loaded_documents():
     }
 
 FREE_TIER_MODELS = [
-    "gemini-3.1-flash-lite",
-    "gemini-3.7-flash",
-    "gemini-3.8-flash",
+    ("gemini-3.1-flash-lite", "minimal"),
+    ("gemini-3.5-flash-lite", "minimal"),
+    ("gemini-3.7-flash", "low"),
+    ("gemini-3.8-flash", "low"),
 ]
 
 
 def _call_gemini(full_input: str):
-    """Runs in a worker thread with automatic fallback across Free Tier models."""
+    """Runs in a worker thread with model-compatible thinking levels."""
+    if not gemini_client:
+        raise HTTPException(status_code=500, detail="GEMINI_API_KEY is not configured on the server.")
     last_error = None
-    for model_name in FREE_TIER_MODELS:
+    for model_name, level in FREE_TIER_MODELS:
         try:
-            print(f"Trying model: {model_name}...", flush=True)
+            print(f"Trying model: {model_name} (thinking={level})...", flush=True)
             return gemini_client.interactions.create(
                 model=model_name,
                 system_instruction=SYSTEM_INSTRUCTION,
                 input=full_input,
                 store=False,
-                generation_config={"thinking_level": "minimal"},
+                generation_config={"thinking_level": level},
             )
         except Exception as err:
             last_error = err
@@ -306,7 +306,7 @@ def chat_with_ai(request: ChatRequest):
             role = "User" if msg.role == "user" else "Assistant"
             conversation_context += f"{role}: {msg.content}\n"
 
-        pdf_context = kb.search(request.message, top_k=8)
+        pdf_context = kb.search(request.message, top_k=5)
 
         full_input = f"""
         VERIFIED NASA PDF EXCERPTS:
