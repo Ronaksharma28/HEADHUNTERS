@@ -102,8 +102,6 @@
         size: 2 + Math.random() * 2.5
       });
     }
-
-    if (window.spaceAudio) window.spaceAudio.playSpark();
   });
 
   function getSimParams() {
@@ -216,7 +214,7 @@
     ctx.fillRect(0, canvas.height - 36, canvas.width, 36);
 
     // Wall structural rivets
-    ctx.fillStyle = "rgba(0, 245, 255, 0.4)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
     for (let x = 40; x < canvas.width; x += 70) {
       ctx.beginPath();
       ctx.arc(x, 18, 2, 0, Math.PI * 2);
@@ -225,10 +223,10 @@
     }
 
     // Left ECLSS Supply Diffuser Louvers (Prominent Airflow Origin)
-    ctx.fillStyle = "rgba(0, 245, 255, 0.08)";
+    ctx.fillStyle = "rgba(56, 189, 248, 0.08)";
     ctx.fillRect(0, 36, 28, canvas.height - 72);
-    ctx.strokeStyle = "#00f5ff";
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(56, 189, 248, 0.6)";
+    ctx.lineWidth = 1.8;
     ctx.strokeRect(1, 37, 26, canvas.height - 74);
 
     for (let y = 56; y < canvas.height - 56; y += 26) {
@@ -241,15 +239,16 @@
     // Right ECLSS Return Exhaust Grille
     ctx.fillStyle = "rgba(71, 85, 105, 0.25)";
     ctx.fillRect(canvas.width - 26, 36, 26, canvas.height - 72);
-    ctx.strokeStyle = "#475569";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
     ctx.strokeRect(canvas.width - 25, 37, 24, canvas.height - 74);
 
-    ctx.fillStyle = "#00f5ff";
-    ctx.font = "bold 11px -apple-system, sans-serif";
+    ctx.fillStyle = "#38bdf8";
+    ctx.font = "600 11px 'JetBrains Mono', monospace";
     ctx.fillText("ECLSS SUPPLY DIFFUSER (INLET)", 36, 23);
     ctx.fillStyle = "#94a3b8";
-    ctx.fillText("CABIN EXHAUST / RECIRCULATION DUCT", canvas.width - 245, 23);
-    ctx.fillText(`MICROGRAVITY: ${p.grav}g  |  AIRFLOW: ${p.vAir} cm/s  |  O₂: ${p.o2}%`, 36, canvas.height - 13);
+    ctx.font = "500 11px 'JetBrains Mono', monospace";
+    ctx.fillText("CABIN EXHAUST / RECIRCULATION DUCT", canvas.width - 275, 23);
+    ctx.fillText(`_MICROGRAVITY: ${p.grav}g  |  AIRFLOW: ${p.vAir} cm/s  |  O₂: ${p.o2}%`, 36, canvas.height - 13);
   }
 
   function drawProminentAirflow(p, burnerX, burnerY, flameRadius) {
@@ -641,8 +640,6 @@
   }
 
   window.applySimPreset = function (preset) {
-    if (window.spaceAudio) window.spaceAudio.playClick();
-
     if (preset === "stagnant") {
       airflowSlider.value = 0;
       flowAngleSlider.value = 0;
@@ -659,7 +656,6 @@
       oxygenSlider.value = 34;
       gravitySelect.value = "0.16";
     } else if (preset === "suppress") {
-      if (window.spaceAudio) window.spaceAudio.playAlert();
       airflowSlider.value = 0;
       flowAngleSlider.value = 0;
       oxygenSlider.value = 14;
