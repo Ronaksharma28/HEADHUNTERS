@@ -1,5 +1,11 @@
 import math
+import time
+import concurrent.futures
+from pydantic import BaseModel, Field
+from google import genai
+from google.genai import types
 from fastapi import FastAPI, Query, HTTPException
+from typing import Literal
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List
 from supabase import create_client
@@ -15,24 +21,78 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_ORIGIN, "http://localhost:3000", "http://localhost:8080"],
+    allow_origins=[
+        "http://127.0.0.1:5500",
+        "http://localhost:5500",
+        "http://localhost:3000",
+        "http://localhost:8080"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_SERVICE_ROLE_KEY)
+gemini_client = genai.Client(
+    api_key=settings.GEMINI_API_KEY,
+    http_options=types.HttpOptions(timeout=15_000),  # 15s max per model attempt (in ms)
+)
+
+# Thread pool used to enforce a hard timeout on the (synchronous) Gemini SDK call
+_gemini_executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
+
+GEMINI_TIMEOUT_SECONDS = 45
+
+SYSTEM_INSTRUCTION = """
+You are a helpful, intelligent, friendly AI assistant.
+
+You are a GENERAL-PURPOSE AI assistant.
+
+You can answer questions about:
+- Science and technology
+- Programming and computer science
+- Mathematics and education
+- General knowledge
+- Everyday topics
+- NASA and space research
+
+Do not restrict yourself to NASA-related topics.
+
+Only discuss NASA when the user's question is relevant.
+
+Respond naturally to greetings like Hi, Hello and Hey.
+
+Never generate unrelated NASA information.
+
+Understand previous conversation messages when relevant.
+
+If you don't know something, be honest.
+
+Keep answers clear and understandable.
+"""
+
+
+class ChatMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=4000)
+    history: list[ChatMessage] = Field(default_factory=list)
+
 
 @app.get("/api/health")
 def health_check():
     return {"status": "online", "database": "Supabase PostgreSQL"}
+
 
 @app.get("/api/kpis")
 def get_dashboard_kpis():
     """Powers kpi-cards.tsx with verified cross-mission summary metrics."""
     runs = supabase.table("experiment_runs").select("*").execute().data
     investigations = supabase.table("investigations").select("id, si_score").execute().data
-    
+
     valid_o2 = [r["oxygen_percent"] for r in runs if r.get("oxygen_percent") is not None]
     valid_hrr = [r["avg_heat_release_w"] for r in runs if r.get("avg_heat_release_w") is not None]
     avg_si = round(sum(i["si_score"] for i in investigations) / len(investigations), 1) if investigations else 0
@@ -45,6 +105,7 @@ def get_dashboard_kpis():
         "peak_heat_release_w": max(valid_hrr) if valid_hrr else None,
         "microgravity_gravity_level": "10⁻⁶ g (ISS / Cygnus)"
     }
+
 
 @app.get("/api/investigations")
 def list_investigations(
@@ -66,6 +127,7 @@ def list_investigations(
         ]
     return rows
 
+
 @app.get("/api/runs", response_model=List[RefinedExperimentRun])
 def get_refined_runs(
     investigation_id: Optional[str] = Query(None, description="Filter by BASS, BASS-II, FLEX, CFI, SAFFIRE-I..V, SAME"),
@@ -86,6 +148,7 @@ def get_refined_runs(
 
     raw_runs = query.execute().data
     return [format_measurement_card(r) for r in raw_runs]
+
 
 @app.get("/api/charts/{chart_group}")
 def get_chart_series(chart_group: str):
@@ -117,15 +180,18 @@ def get_chart_series(chart_group: str):
 
     return res.data
 
+
 @app.get("/api/habitat-radar")
 def get_habitat_radar_comparison():
     """Powers habitat-radar.tsx directly from Supabase habitat_risk_profiles."""
     return supabase.table("habitat_risk_profiles").select("*").execute().data
 
+
 @app.get("/api/si-assistant")
 def get_si_assistant_qa():
     """Powers si-assistant.tsx with verified NASA-backed Q&A."""
     return supabase.table("si_knowledge_qa").select("*").execute().data
+
 
 @app.get("/api/simulate", response_model=SimulationResponse)
 def simulate_microgravity_fire(
@@ -184,3 +250,77 @@ def simulate_microgravity_fire(
         risk_score=risk_score, risk_label=risk_label, predicted_steady_flame_cm=estimated_size,
         safety_advice=advice, model_basis="Empirical interpolation from NASA Saffire I–V & BASS-II"
     )
+
+
+FREE_TIER_MODELS = [
+    "gemini-3.1-flash-lite",
+    "gemini-3.7-flash",
+    "gemini-3.8-flash",
+]
+
+
+def _call_gemini(full_input: str):
+    """Runs in a worker thread with automatic fallback across Free Tier models."""
+    last_error = None
+    for model_name in FREE_TIER_MODELS:
+        try:
+            print(f"Trying model: {model_name}...", flush=True)
+            return gemini_client.interactions.create(
+                model=model_name,
+                system_instruction=SYSTEM_INSTRUCTION,
+                input=full_input,
+                store=False,
+                generation_config={"thinking_level": "minimal"},
+            )
+        except Exception as err:
+            last_error = err
+            print(f"Model {model_name} failed ({repr(err)}), trying fallback...", flush=True)
+            continue
+    raise last_error
+
+
+@app.post("/api/chat")
+def chat_with_ai(request: ChatRequest):
+    print("CHAT ENDPOINT CALLED!", flush=True)
+    try:
+        conversation_context = ""
+        for msg in request.history[-12:]:
+            role = "User" if msg.role == "user" else "Assistant"
+            conversation_context += f"{role}: {msg.content}\n"
+
+        full_input = f"""
+        Previous conversation:
+        {conversation_context}
+
+        Current user message:
+        {request.message}
+        """
+
+        start_time = time.time()
+        print("Sending request to Gemini...", flush=True)
+
+        future = _gemini_executor.submit(_call_gemini, full_input)
+        try:
+            interaction = future.result(timeout=GEMINI_TIMEOUT_SECONDS)
+        except concurrent.futures.TimeoutError:
+            print(f"Gemini call exceeded {GEMINI_TIMEOUT_SECONDS}s timeout", flush=True)
+            raise HTTPException(
+                status_code=504,
+                detail="The AI took too long to respond. Please try again."
+            )
+
+        print(f"Gemini response time: {time.time() - start_time:.2f} seconds", flush=True)
+
+        if not interaction.output_text:
+            raise HTTPException(status_code=502, detail="Gemini returned an empty response.")
+
+        return {"answer": interaction.output_text}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("Gemini Error:", repr(e), flush=True)
+        raise HTTPException(
+            status_code=502,
+            detail=f"Gemini API error: {str(e)}"
+        )

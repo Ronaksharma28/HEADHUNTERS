@@ -529,27 +529,138 @@ function appendChatMessage(sender, text) {
   }
 }
 
+// Store conversation history
+let chatHistory = [];
+
+// Send message to Gemini backend
+async function askAI(question) {
+    appendChatMessage("user", question);
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/api/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: question,
+                history: chatHistory
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "AI request failed");
+        }
+
+        // Save conversation history
+        chatHistory.push({
+            role: "user",
+            content: question
+        });
+
+        chatHistory.push({
+            role: "assistant",
+            content: data.answer
+        });
+
+        appendChatMessage("bot", data.answer);
+
+    } catch (error) {
+        console.error("AI Chat Error:", error);
+
+        appendChatMessage(
+            "bot",
+            "Sorry, I couldn't connect to the AI assistant. Please check whether the backend is running."
+        );
+    }
+}
+
+// Preset question buttons
 window.askPresetQuestion = function (question) {
-  appendChatMessage("user", question);
-  if (window.spaceAudio) window.spaceAudio.playHover();
-  setTimeout(() => {
-    appendChatMessage("bot", generateAIResponse(question));
-    if (window.spaceAudio) window.spaceAudio.playHover();
-  }, 220);
+    if (window.spaceAudio) {
+        window.spaceAudio.playHover();
+    }
+
+    askAI(question);
 };
 
+// Store conversation history
+// Send message to Gemini backend
+async function askAI(question) {
+    appendChatMessage("user", question);
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/api/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: question,
+                history: chatHistory
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "AI request failed");
+        }
+
+        // Save conversation history
+        chatHistory.push({
+            role: "user",
+            content: question
+        });
+
+        chatHistory.push({
+            role: "assistant",
+            content: data.answer
+        });
+
+        appendChatMessage("bot", data.answer);
+
+    } catch (error) {
+        console.error("AI Chat Error:", error);
+
+        appendChatMessage(
+            "bot",
+            "Sorry, I couldn't connect to the AI assistant. Please check whether the backend is running."
+        );
+    }
+}
+
+// Preset question buttons
+window.askPresetQuestion = function (question) {
+    if (window.spaceAudio) {
+        window.spaceAudio.playHover();
+    }
+
+    askAI(question);
+};
+
+// Normal chat input
 const chatForm = document.getElementById("chatForm");
+
 if (chatForm) {
-  chatForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const input = document.getElementById("chatInput");
-    const text = input.value.trim();
-    if (!text) return;
-    appendChatMessage("user", text);
-    input.value = "";
-    if (window.spaceAudio) window.spaceAudio.playClick();
-    setTimeout(() => appendChatMessage("bot", generateAIResponse(text)), 240);
-  });
+    chatForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const input = document.getElementById("chatInput");
+        const question = input.value.trim();
+
+        if (!question) return;
+
+        input.value = "";
+
+        if (window.spaceAudio) {
+            window.spaceAudio.playClick();
+        }
+
+        askAI(question);
+    });
 }
 
 /* ========================================================

@@ -3,7 +3,8 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     SUPABASE_URL: str
     SUPABASE_SERVICE_ROLE_KEY: str
-    FRONTEND_ORIGIN: str = "http://localhost:5173"
+    GEMINI_API_KEY: str
+    FRONTEND_ORIGIN: str = "http://localhost:5500"
 
     class Config:
         env_file = ".env"
