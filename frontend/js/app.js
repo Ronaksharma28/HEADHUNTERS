@@ -528,9 +528,36 @@ function appendChatMessage(sender, text) {
 // Store conversation history
 let chatHistory = [];
 
+function showThinkingBubble() {
+  const box = document.getElementById("chatMessages");
+  if (!box) return;
+  removeThinkingBubble();
+
+  const div = document.createElement("div");
+  div.id = "aiThinkingBubble";
+  div.className = "msg bot ai-thinking";
+  div.innerHTML = `
+    <strong>PSI Combustion Assistant:</strong>
+    <div class="thinking-indicator">
+      <div class="thinking-dots" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+      <span>Thinking...</span>
+    </div>
+  `;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function removeThinkingBubble() {
+  const bubble = document.getElementById("aiThinkingBubble");
+  if (bubble) bubble.remove();
+}
+
 // Send message to Gemini backend
 async function askAI(question) {
   appendChatMessage("user", question);
+  showThinkingBubble();
 
   try {
     const response = await fetch(`${window.BACKEND_BASE_URL || "http://127.0.0.1:8000"}/api/chat`, {
@@ -553,9 +580,11 @@ async function askAI(question) {
     chatHistory.push({ role: "user", content: question });
     chatHistory.push({ role: "assistant", content: data.answer });
 
+    removeThinkingBubble();
     appendChatMessage("bot", data.answer);
   } catch (error) {
     console.error("AI Chat Error:", error);
+    removeThinkingBubble();
     const msg = error.message.includes("Failed to fetch")
       ? "Cannot reach the backend at http://127.0.0.1:8000. Make sure Uvicorn is running."
       : `AI Assistant Error: ${error.message}`;
