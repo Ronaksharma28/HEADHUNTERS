@@ -1,4 +1,3 @@
-cat << 'EOF' > api-bridge.js
 // Live API Bridge: Connects design_1 frontend to FastAPI + Supabase PostgreSQL
 (function () {
   const API_BASE = "http://127.0.0.1:8000/api";
@@ -168,4 +167,3 @@ cat << 'EOF' > api-bridge.js
     bindLiveSimulatorAPI();
   });
 })();
-EOF
