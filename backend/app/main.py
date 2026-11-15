@@ -12,6 +12,7 @@ from supabase import create_client
 from app.config import settings
 from app.cleaner import format_measurement_card
 from app.schemas import RefinedExperimentRun, SimulationResponse
+from app.pdf_knowledge import kb
 
 app = FastAPI(
     title="Flame in Freefall — NASA Microgravity Combustion API",
@@ -48,31 +49,15 @@ _gemini_executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 GEMINI_TIMEOUT_SECONDS = 45
 
 SYSTEM_INSTRUCTION = """
-You are a helpful, intelligent, friendly AI assistant.
+You are the Flame in Freefall AI Research Assistant — a helpful, intelligent assistant specializing in NASA microgravity combustion and spacecraft fire safety, while also capable of answering general science, programming, math, and everyday questions.
 
-You are a GENERAL-PURPOSE AI assistant.
-
-You can answer questions about:
-- Science and technology
-- Programming and computer science
-- Mathematics and education
-- General knowledge
-- Everyday topics
-- NASA and space research
-
-Do not restrict yourself to NASA-related topics.
-
-Only discuss NASA when the user's question is relevant.
-
-Respond naturally to greetings like Hi, Hello and Hey.
-
-Never generate unrelated NASA information.
-
-Understand previous conversation messages when relevant.
-
-If you don't know something, be honest.
-
-Keep answers clear and understandable.
+Rules:
+1. When the user asks about microgravity fires, spacecraft safety, or NASA investigations (Saffire, BASS, SoFIE, FLEX, CFI, SAME, DAFT, SLICE, SPICE, FLARE), ground your answer in the VERIFIED NASA PDF EXCERPTS provided in the prompt.
+2. Always cite the exact document filename, experiment/run ID, measurement units, and NTRS/ICES source from the excerpts.
+3. Never invent numbers or replace unreported measurements with 0; explicitly state "not reported" if a figure is missing from the excerpts.
+4. Clearly distinguish direct flight/experimental observations from model predictions or limitations.
+5. For casual greetings (Hi, Hello, Hey) or non-NASA questions, respond naturally and helpfully without forcing unrelated NASA facts.
+6. Keep explanations clear, structured, and easy to understand.
 """
 
 
@@ -255,6 +240,14 @@ def simulate_microgravity_fire(
         safety_advice=advice, model_basis="Empirical interpolation from NASA Saffire I–V & BASS-II"
     )
 
+@app.get("/api/documents")
+def list_loaded_documents():
+    """Lists all NASA PDFs indexed from backend/data/pdfs/."""
+    return {
+        "total_files": len(kb.files_summary),
+        "total_indexed_pages": len(kb.pages),
+        "documents": kb.files_summary,
+    }
 
 FREE_TIER_MODELS = [
     "gemini-3.1-flash-lite",
@@ -292,7 +285,12 @@ def chat_with_ai(request: ChatRequest):
             role = "User" if msg.role == "user" else "Assistant"
             conversation_context += f"{role}: {msg.content}\n"
 
+        pdf_context = kb.search(request.message, top_k=8)
+
         full_input = f"""
+        VERIFIED NASA PDF EXCERPTS:
+        {pdf_context}
+
         Previous conversation:
         {conversation_context}
 
