@@ -1,12 +1,13 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    SUPABASE_URL: str
-    SUPABASE_SERVICE_ROLE_KEY: str
-    GEMINI_API_KEY: str
+    SUPABASE_URL: str = ""
+    SUPABASE_SERVICE_ROLE_KEY: str = ""
+    GEMINI_API_KEY: str = ""
     FRONTEND_ORIGIN: str = "http://localhost:5500"
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 settings = Settings()

@@ -37,11 +37,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_SERVICE_ROLE_KEY)
-gemini_client = genai.Client(
-    api_key=settings.GEMINI_API_KEY,
-    http_options=types.HttpOptions(timeout=15_000),  # 15s max per model attempt (in ms)
+supabase = (
+    create_client(settings.SUPABASE_URL, settings.SUPABASE_SERVICE_ROLE_KEY)
+    if settings.SUPABASE_URL and settings.SUPABASE_SERVICE_ROLE_KEY
+    else None
 )
+if not supabase:
+    print("⚠️ WARNING: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is missing.", flush=True)
+
+gemini_client = (
+    genai.Client(
+        api_key=settings.GEMINI_API_KEY,
+        http_options=types.HttpOptions(timeout=15_000),
+    )
+    if settings.GEMINI_API_KEY
+    else None
+)
+if not gemini_client:
+    print("⚠️ WARNING: GEMINI_API_KEY is missing.", flush=True)
 
 # Thread pool used to enforce a hard timeout on the (synchronous) Gemini SDK call
 _gemini_executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
@@ -73,7 +86,13 @@ class ChatRequest(BaseModel):
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "online", "database": "Supabase PostgreSQL"}
+    return {
+        "status": "online",
+        "supabase_configured": supabase is not None,
+        "gemini_configured": gemini_client is not None,
+        "indexed_pdfs": len(kb.files_summary),
+        "indexed_pages": len(kb.pages),
+    }
 
 
 @app.get("/api/kpis")
