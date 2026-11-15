@@ -53,6 +53,8 @@ const VIEW_METADATA = {
    1. NAVIGATION & VIEW SWITCHING
    ======================================================== */
 function switchView(viewId) {
+  if (window.spaceAudio) window.spaceAudio.playClick();
+
   document.querySelectorAll(".view-section").forEach((sec) => sec.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach((btn) => btn.classList.remove("active"));
 
@@ -85,7 +87,20 @@ document.querySelectorAll(".nav-item").forEach((btn) => {
 const menuToggle = document.getElementById("menuToggle");
 if (menuToggle) {
   menuToggle.addEventListener("click", () => {
+    if (window.spaceAudio) window.spaceAudio.playClick();
     document.getElementById("sidebar").classList.toggle("open");
+  });
+}
+
+// Audio FX Toggle Button
+const audioToggleBtn = document.getElementById("audioToggleBtn");
+if (audioToggleBtn) {
+  audioToggleBtn.addEventListener("click", () => {
+    if (window.spaceAudio) {
+      const isEnabled = window.spaceAudio.toggleSound();
+      audioToggleBtn.innerHTML = isEnabled ? `<span>🔊</span> Audio: ON` : `<span>🔇</span> Audio: OFF`;
+      audioToggleBtn.classList.toggle("muted-state", !isEnabled);
+    }
   });
 }
 
@@ -138,15 +153,13 @@ function renderExperimentCards() {
       <div class="flashcard-inner" id="card-${exp.id}">
         <!-- FRONT SIDE OF FLASHCARD -->
         <article class="flashcard-face flashcard-front">
-          <div class="tech-corner tl">+</div>
-          <div class="tech-corner tr">+</div>
           <div class="exp-card-top">
-            <span class="exp-code">_${exp.code}</span>
-            <span class="facility-badge">${exp.facility}</span>
+            <span class="exp-code">${exp.code}</span>
+            <span class="facility-badge">${exp.icon} ${exp.facility}</span>
           </div>
           <h4 class="card-title">${exp.title}</h4>
           <div class="flashcard-question-box">
-            <span class="question-label">_MISSION RESEARCH CHALLENGE</span>
+            <span class="question-label">MISSION RESEARCH CHALLENGE</span>
             <p class="question-text">${exp.flashcardFront.question}</p>
           </div>
           <p class="exp-summary">${exp.shortSummary}</p>
@@ -155,32 +168,30 @@ function renderExperimentCards() {
           </div>
           <div class="card-action-row">
             <button class="btn-flip" onclick="flipFlashcard('${exp.id}', event)">
-              <span>Flip Flashcard 🔄</span>
+              <span>🔄 Flip Flashcard</span>
             </button>
             <button class="btn-charts-link" onclick="openExperimentDetail('${exp.id}')">
-              <span>Inspect Graphs ↗</span>
+              <span>Inspect Graphs →</span>
             </button>
           </div>
         </article>
 
         <!-- BACK SIDE OF FLASHCARD -->
         <article class="flashcard-face flashcard-back">
-          <div class="tech-corner tl">+</div>
-          <div class="tech-corner tr">+</div>
           <div class="exp-card-top">
-            <span class="exp-code">_${exp.code}</span>
-            <span class="physics-badge">_PHYSICAL LAW & SAFETY</span>
+            <span class="exp-code">${exp.code}</span>
+            <span class="physics-badge">PHYSICAL LAW & SAFETY</span>
           </div>
-          <h4 class="card-title" style="color:#ffffff">NASA PSI Discovery</h4>
+          <h4 class="card-title" style="color:${exp.accentColor}">NASA PSI Discovery</h4>
           <p class="back-discovery">${exp.flashcardBack.discovery}</p>
           
           <div class="back-physics-box">
-            <strong>_FLUID TRANSPORT MECHANISM:</strong>
+            <strong>Fluid Transport Mechanism:</strong>
             <p>${exp.flashcardBack.physicsLaw}</p>
           </div>
 
           <div class="back-impact-box">
-            <strong>_FLIGHT SAFETY CONSEQUENCE:</strong>
+            <strong>Flight Safety Consequence:</strong>
             <p>${exp.flashcardBack.flightImpact}</p>
           </div>
 
@@ -189,7 +200,7 @@ function renderExperimentCards() {
               <span>↩ Flip to Front</span>
             </button>
             <button class="btn-charts-link" onclick="openExperimentDetail('${exp.id}')">
-              <span>Inspect Graphs ↗</span>
+              <span>Telemetry Telemetry 📊</span>
             </button>
           </div>
         </article>
@@ -226,16 +237,14 @@ function renderStudyDeckMode(container, experiments) {
       <div class="flashcard-inner" id="card-${exp.id}" onclick="flipFlashcard('${exp.id}', event)">
         <!-- FRONT -->
         <article class="flashcard-face flashcard-front">
-          <div class="tech-corner tl">+</div>
-          <div class="tech-corner tr">+</div>
           <div class="exp-card-top">
-            <span class="exp-code">_${exp.code}</span>
-            <span class="facility-badge">${exp.facility}</span>
+            <span class="exp-code">${exp.code}</span>
+            <span class="facility-badge">${exp.icon} ${exp.facility}</span>
           </div>
-          <h3 class="card-title" style="font-size:22px;">${exp.title}</h3>
+          <h3 class="card-title">${exp.title}</h3>
           <div class="flashcard-question-box">
-            <span class="question-label">_FLASHCARD CORE QUESTION</span>
-            <p class="question-text" style="font-size:15.5px">${exp.flashcardFront.question}</p>
+            <span class="question-label">FLASHCARD CORE QUESTION</span>
+            <p class="question-text" style="font-size:16px">${exp.flashcardFront.question}</p>
           </div>
           <p class="hint-text">💡 Hint: ${exp.flashcardFront.hint}</p>
           <div class="card-metric-pill">
@@ -246,25 +255,23 @@ function renderStudyDeckMode(container, experiments) {
 
         <!-- BACK -->
         <article class="flashcard-face flashcard-back">
-          <div class="tech-corner tl">+</div>
-          <div class="tech-corner tr">+</div>
           <div class="exp-card-top">
-            <span class="exp-code">_${exp.code}</span>
-            <span class="physics-badge">_ANSWER & FLIGHT IMPACT</span>
+            <span class="exp-code">${exp.code}</span>
+            <span class="physics-badge">ANSWER & FLIGHT IMPACT</span>
           </div>
-          <h3 class="card-title" style="font-size:22px; color:#ffffff;">NASA Finding</h3>
-          <p class="back-discovery" style="font-size:14.5px">${exp.flashcardBack.discovery}</p>
+          <h3 class="card-title" style="color:${exp.accentColor}">NASA Finding</h3>
+          <p class="back-discovery" style="font-size:15px">${exp.flashcardBack.discovery}</p>
           <div class="back-physics-box">
-            <strong>_PHYSICS EXPLANATION:</strong>
+            <strong>Physics Explanation:</strong>
             <p>${exp.flashcardBack.physicsLaw}</p>
           </div>
           <div class="back-impact-box">
-            <strong>_FLIGHT ARCHITECTURE IMPACT:</strong>
+            <strong>Flight Architecture Impact:</strong>
             <p>${exp.flashcardBack.flightImpact}</p>
           </div>
-          <div class="card-action-row" style="margin-top: 14px;">
+          <div class="card-action-row">
             <button class="btn-charts-link" onclick="event.stopPropagation(); openExperimentDetail('${exp.id}')">
-              <span>Inspect Graphs ↗</span>
+              Inspect Data Telemetry Charts 📊
             </button>
           </div>
         </article>
@@ -278,6 +285,7 @@ window.flipFlashcard = function (id, event) {
   const card = document.getElementById(`card-${id}`);
   if (card) {
     card.classList.toggle("flipped");
+    if (window.spaceAudio) window.spaceAudio.playFlip();
   }
 };
 
@@ -297,6 +305,7 @@ window.shuffleFlashcards = function () {
   const experiments = getFilteredExperiments();
   currentDeckIndex = Math.floor(Math.random() * experiments.length);
   renderExperimentCards();
+  if (window.spaceAudio) window.spaceAudio.playClick();
 };
 
 window.setDeckFilter = function (cat, btn) {
@@ -305,6 +314,7 @@ window.setDeckFilter = function (cat, btn) {
   document.querySelectorAll(".deck-filter-chip").forEach((c) => c.classList.remove("active"));
   if (btn) btn.classList.add("active");
   renderExperimentCards();
+  if (window.spaceAudio) window.spaceAudio.playClick();
 };
 
 window.setViewMode = function (mode) {
@@ -313,6 +323,7 @@ window.setViewMode = function (mode) {
   const activeBtn = document.getElementById(`mode-${mode}`);
   if (activeBtn) activeBtn.classList.add("active");
   renderExperimentCards();
+  if (window.spaceAudio) window.spaceAudio.playClick();
 };
 
 window.resetExpFilters = function () {
@@ -343,6 +354,8 @@ window.addEventListener("keydown", (e) => {
 function openExperimentDetail(expId) {
   const exp = NASA_EXPERIMENTS.find((e) => e.id === expId);
   if (!exp) return;
+
+  if (window.spaceAudio) window.spaceAudio.playClick();
 
   document.querySelectorAll(".flashcard-inner").forEach((c) => c.classList.remove("selected"));
   const activeCard = document.getElementById(`card-${exp.id}`);
@@ -391,8 +404,8 @@ function openExperimentDetail(expId) {
         legend: { labels: { color: "#e2e8f0", font: { family: "Inter, sans-serif" } } }
       },
       scales: {
-        x: { ticks: { color: "#e2e8f0" }, grid: { color: "rgba(255, 255, 255, 0.08)" } },
-        y: { ticks: { color: "#e2e8f0" }, grid: { color: "rgba(255, 255, 255, 0.08)" } }
+        x: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(34, 48, 77, 0.4)" } },
+        y: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(34, 48, 77, 0.4)" } }
       }
     }
   });
@@ -406,18 +419,18 @@ function openExperimentDetail(expId) {
         {
           label: "Earth Baseline (1g)",
           data: exp.chart2.g1,
-          backgroundColor: "rgba(255, 255, 255, 0.2)",
-          borderColor: "rgba(255, 255, 255, 0.5)",
-          borderWidth: 1.2,
-          borderRadius: 6
+          backgroundColor: "rgba(59, 130, 246, 0.75)",
+          borderColor: "#3b82f6",
+          borderWidth: 1.5,
+          borderRadius: 5
         },
         {
           label: "Microgravity Flight (0g)",
           data: exp.chart2.g0,
-          backgroundColor: "rgba(249, 115, 22, 0.85)",
-          borderColor: "#f97316",
-          borderWidth: 1.2,
-          borderRadius: 6
+          backgroundColor: "rgba(0, 245, 255, 0.8)",
+          borderColor: "#00f5ff",
+          borderWidth: 1.5,
+          borderRadius: 5
         }
       ]
     },
@@ -427,8 +440,8 @@ function openExperimentDetail(expId) {
         legend: { labels: { color: "#e2e8f0", font: { family: "Inter, sans-serif" } } }
       },
       scales: {
-        x: { ticks: { color: "#e2e8f0" }, grid: { color: "rgba(255, 255, 255, 0.08)" } },
-        y: { ticks: { color: "#e2e8f0" }, grid: { color: "rgba(255, 255, 255, 0.08)" } }
+        x: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(34, 48, 77, 0.4)" } },
+        y: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(34, 48, 77, 0.4)" } }
       }
     }
   });
@@ -439,6 +452,7 @@ function openExperimentDetail(expId) {
 const closeDetailBtn = document.getElementById("closeDetailBtn");
 if (closeDetailBtn) {
   closeDetailBtn.addEventListener("click", () => {
+    if (window.spaceAudio) window.spaceAudio.playClick();
     document.getElementById("experimentDetailPanel").classList.remove("open");
     document.querySelectorAll(".flashcard-inner").forEach((c) => c.classList.remove("selected"));
   });
@@ -482,6 +496,7 @@ function appendChatMessage(sender, text) {
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
   } else {
+    // Typewriter effect for AI response
     div.innerHTML = `<strong>PSI Combustion Assistant:</strong> <span class="typing-text"></span><span class="cursor-blink">▌</span>`;
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
@@ -490,26 +505,15 @@ function appendChatMessage(sender, text) {
     const cursor = div.querySelector(".cursor-blink");
     let charIdx = 0;
 
-    function formatChatMarkdown(raw) {
-      return raw
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/^#{2,3}\s*(.*)$/gm, "<div style='font-weight:700;color:#38bdf8;margin-top:10px;margin-bottom:4px;'>$1</div>")
-        .replace(/^\s*[\*\-]\s+(.*)$/gm, "<div style='padding-left:12px;margin:2px 0;'>• $1</div>")
-        .replace(/\n/g, "<br>");
-    }
-
     function typeChar() {
       if (charIdx < text.length) {
-        charIdx += 2; // Smooth 2-char step per frame
-        textSpan.innerHTML = formatChatMarkdown(text.slice(0, charIdx));
+        textSpan.textContent += text.charAt(charIdx);
+        charIdx++;
         box.scrollTop = box.scrollHeight;
-        setTimeout(typeChar, 12);
+        setTimeout(typeChar, 14);
       } else {
-        textSpan.innerHTML = formatChatMarkdown(text);
         cursor.remove();
+        // Add Copy Button
         const copyBtn = document.createElement("button");
         copyBtn.className = "copy-msg-btn";
         copyBtn.innerHTML = `📋 Copy`;
@@ -530,67 +534,133 @@ let chatHistory = [];
 
 // Send message to Gemini backend
 async function askAI(question) {
-  appendChatMessage("user", question);
+    appendChatMessage("user", question);
 
-  try {
-    const response = await fetch(`${window.BACKEND_BASE_URL || "http://127.0.0.1:8000"}/api/chat`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: question,
-        history: chatHistory
-      })
-    });
+    try {
+        const response = await fetch("http://127.0.0.1:8000/api/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: question,
+                history: chatHistory
+            })
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.detail || `Server error (${response.status})`);
+        if (!response.ok) {
+            throw new Error(data.detail || "AI request failed");
+        }
+
+        // Save conversation history
+        chatHistory.push({
+            role: "user",
+            content: question
+        });
+
+        chatHistory.push({
+            role: "assistant",
+            content: data.answer
+        });
+
+        appendChatMessage("bot", data.answer);
+
+    } catch (error) {
+        console.error("AI Chat Error:", error);
+
+        appendChatMessage(
+            "bot",
+            "Sorry, I couldn't connect to the AI assistant. Please check whether the backend is running."
+        );
     }
-
-    chatHistory.push({ role: "user", content: question });
-    chatHistory.push({ role: "assistant", content: data.answer });
-
-    appendChatMessage("bot", data.answer);
-  } catch (error) {
-    console.error("AI Chat Error:", error);
-    const msg = error.message.includes("Failed to fetch")
-      ? "Cannot reach the backend at http://127.0.0.1:8000. Make sure Uvicorn is running."
-      : `AI Assistant Error: ${error.message}`;
-    appendChatMessage("bot", msg);
-  }
 }
 
 // Preset question buttons
 window.askPresetQuestion = function (question) {
-  if (window.spaceAudio) {
-    window.spaceAudio.playHover();
-  }
-  askAI(question);
+    if (window.spaceAudio) {
+        window.spaceAudio.playHover();
+    }
+
+    askAI(question);
+};
+
+// Store conversation history
+// Send message to Gemini backend
+async function askAI(question) {
+    appendChatMessage("user", question);
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/api/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: question,
+                history: chatHistory
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "AI request failed");
+        }
+
+        // Save conversation history
+        chatHistory.push({
+            role: "user",
+            content: question
+        });
+
+        chatHistory.push({
+            role: "assistant",
+            content: data.answer
+        });
+
+        appendChatMessage("bot", data.answer);
+
+    } catch (error) {
+        console.error("AI Chat Error:", error);
+
+        appendChatMessage(
+            "bot",
+            "Sorry, I couldn't connect to the AI assistant. Please check whether the backend is running."
+        );
+    }
+}
+
+// Preset question buttons
+window.askPresetQuestion = function (question) {
+    if (window.spaceAudio) {
+        window.spaceAudio.playHover();
+    }
+
+    askAI(question);
 };
 
 // Normal chat input
 const chatForm = document.getElementById("chatForm");
 
 if (chatForm) {
-  chatForm.addEventListener("submit", (e) => {
-    e.preventDefault();
+    chatForm.addEventListener("submit", (e) => {
+        e.preventDefault();
 
-    const input = document.getElementById("chatInput");
-    const question = input.value.trim();
+        const input = document.getElementById("chatInput");
+        const question = input.value.trim();
 
-    if (!question) return;
+        if (!question) return;
 
-    input.value = "";
+        input.value = "";
 
-    if (window.spaceAudio) {
-      window.spaceAudio.playClick();
-    }
+        if (window.spaceAudio) {
+            window.spaceAudio.playClick();
+        }
 
-    askAI(question);
-  });
+        askAI(question);
+    });
 }
 
 /* ========================================================
@@ -609,22 +679,22 @@ function renderTheoryChart() {
         {
           label: "Microgravity (0g) Flame Spread Rate (mm/s)",
           data: [0.05, 0.95, 1.65, 1.95, 1.88, 1.52, 1.05, 0.45],
-          borderColor: "#ffffff",
-          backgroundColor: "rgba(255, 255, 255, 0.08)",
+          borderColor: "#00f5ff",
+          backgroundColor: "rgba(0, 245, 255, 0.18)",
           fill: true,
           tension: 0.35,
-          borderWidth: 2.4,
-          pointBackgroundColor: "#ffffff"
+          borderWidth: 2.8,
+          pointBackgroundColor: "#00f5ff"
         },
         {
           label: "Normal Gravity (1g) Opposed Flow Spread Rate (mm/s)",
           data: [1.35, 1.32, 1.28, 1.24, 1.18, 1.05, 0.85, 0.62],
-          borderColor: "#f97316",
-          backgroundColor: "rgba(249, 115, 22, 0.08)",
+          borderColor: "#ff7b00",
+          backgroundColor: "rgba(255, 123, 0, 0.12)",
           fill: false,
           tension: 0.35,
-          borderWidth: 2.2,
-          pointBackgroundColor: "#f97316"
+          borderWidth: 2.5,
+          pointBackgroundColor: "#ff7b00"
         }
       ]
     },
@@ -634,11 +704,11 @@ function renderTheoryChart() {
         legend: { labels: { color: "#e2e8f0", font: { family: "Inter, sans-serif" } } }
       },
       scales: {
-        x: { ticks: { color: "#e2e8f0" }, grid: { color: "rgba(255, 255, 255, 0.08)" } },
+        x: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(34, 48, 77, 0.4)" } },
         y: {
-          title: { display: true, text: "Spread Velocity (mm/s)", color: "#e2e8f0" },
-          ticks: { color: "#e2e8f0" },
-          grid: { color: "rgba(255, 255, 255, 0.08)" }
+          title: { display: true, text: "Spread Velocity (mm/s)", color: "#94a3b8" },
+          ticks: { color: "#94a3b8" },
+          grid: { color: "rgba(34, 48, 77, 0.4)" }
         }
       }
     }
@@ -786,11 +856,11 @@ window.updateRiskProfile = function () {
             missionBase.detectScore,
             Math.min(100, 40 + fuel * 0.45)
           ],
-          backgroundColor: "rgba(249, 115, 22, 0.2)",
-          borderColor: "#f97316",
-          pointBackgroundColor: "#ffffff",
-          pointBorderColor: "#f97316",
-          borderWidth: 2
+          backgroundColor: "rgba(0, 245, 255, 0.22)",
+          borderColor: "#00f5ff",
+          pointBackgroundColor: "#ff7b00",
+          pointBorderColor: "#ffffff",
+          borderWidth: 2.2
         }
       ]
     },
@@ -801,8 +871,8 @@ window.updateRiskProfile = function () {
           min: 0,
           max: 100,
           ticks: { display: false },
-          grid: { color: "rgba(255, 255, 255, 0.08)" },
-          angleLines: { color: "rgba(255, 255, 255, 0.08)" },
+          grid: { color: "rgba(34, 48, 77, 0.5)" },
+          angleLines: { color: "rgba(34, 48, 77, 0.5)" },
           pointLabels: { color: "#cbd5e1", font: { size: 11, family: "Inter, sans-serif" } }
         }
       },
@@ -822,6 +892,7 @@ window.sortSITable = function (col) {
     siSortAsc = true;
   }
   renderSIRanking();
+  if (window.spaceAudio) window.spaceAudio.playClick();
 };
 
 window.renderSIRanking = function () {
@@ -896,8 +967,8 @@ window.renderSIRanking = function () {
       responsive: true,
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { color: "#e2e8f0", maxRotation: 25 }, grid: { display: false } },
-        y: { min: 0, max: 100, ticks: { color: "#e2e8f0" }, grid: { color: "rgba(255, 255, 255, 0.08)" } }
+        x: { ticks: { color: "#94a3b8", maxRotation: 25 }, grid: { display: false } },
+        y: { min: 0, max: 100, ticks: { color: "#94a3b8" }, grid: { color: "rgba(34, 48, 77, 0.4)" } }
       }
     }
   });
